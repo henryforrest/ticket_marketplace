@@ -1,0 +1,72 @@
+{% include 'ticket_app/navbar.html' %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExEvents</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden; /* Prevents scrollbars from appearing */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('static/ticket_app/clubscene.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(8px); /* Adjust blur amount as needed */
+            z-index: -1; /* Places the background behind the content */
+        }
+        .container {
+            text-align: center;
+            background: rgba(192, 192, 192, 0.8); /* Slightly transparent silver color */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: grey;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <h1>ExEvents</h1>
+        <p>Please log in or sign up to continue.</p>
+        <a href="{% url 'login' %}" class="button">Log In</a>
+        <a href="{% url 'signup' %}" class="button">Sign Up</a>
+    </div>
+</body>
+</html>

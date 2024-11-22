@@ -1,0 +1,216 @@
+{% include 'ticket_app/navbar.html' %}
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{% static "ticket_app/clubscene.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: fixed;
+            filter: blur(8px);
+            z-index: -1;
+        }
+        .container {
+            text-align: center;
+            background: rgba(192, 192, 192, 0.8);
+            padding: 20px;
+            flex-wrap: wrap;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            width: 80%;
+            max-width: 600px;
+            height: 70vh;
+            overflow-y: scroll;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .tabs {
+            margin-bottom: 20px;
+        }
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: grey;
+            color: white;
+            border-radius: 5px;
+        }
+        .tab:hover{
+            background-color: #0056b3;
+        }
+        .tab.active {
+            background-color: #004080;
+        }
+        .tickets-list {
+            padding: 10px;
+        }
+        .ticket-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            color: #fff;
+            background-color: grey;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: grey;
+        }
+        .btn-secondary {
+            background-color: #0056b3;
+        }
+        .btn:hover {
+            background-color: #004080;
+        }
+        .user-info {
+            margin-bottom: 20px;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <h1><u>Your Profile</u></h1>
+
+        <!-- Tabs for Tickets Bought and Tickets Sold -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('profile')">Profile</div>
+            <div class="tab" onclick="showTab('bought')">Tickets Bought</div>
+            <div class="tab" onclick="showTab('sold')">Tickets Sold</div>
+        </div>
+
+        <!-- User Information Section -->
+        <div id="profile" class="user-info">
+            <h2>Your Detials</h2>
+            <p><strong>Username: </strong>{{ user.username }}</p>
+            <p><strong>Email: </strong>{{ user.email }}</p>
+
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('edit_profile')">Edit Profile</div>
+            </div>
+
+        </div>
+
+
+        <!-- edit details  -->
+        <form method="POST" action="{% url 'home' %}" id="edit_profile">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Change Username</label>
+                <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}">
+            </div>
+            <div class="form-group">
+                <label for="email">Change Email</label>
+                <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+
+        <!-- Tickets Bought  -->
+        <div id="bought" class="tab-content" style="display:none;">
+            <h3>Tickets you've bought</h3>
+            <div class="tickets-list">
+              {% if bought_tickets %}
+                {% for ticket in bought_tickets %}
+                  <div class="ticket-container">
+                    <h3>{{ ticket.event }}</h3>
+                    <p>Date: {{ ticket.date }}</p>
+                    <p>Time: {{ ticket.time }}</p>
+                    <p>Price: £{{ ticket.price }}</p>
+                    <p class="user"><strong>Seller:</strong> {{ ticket.seller.username }}</p>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>You have not bought any tickets yet.</p>
+              {% endif %}
+            </div>
+        </div>
+
+
+        <!-- Content for selling tickets -->
+        <div id="sold" class="tab-content" style="display:none;">
+            <h3>Tickets You're Selling/Sold:</h3>
+            <div class="tickets-list">
+              {% if sold_tickets %}
+                {% for ticket in sold_tickets %}
+                  <div class="ticket-container">
+                    <h3>{{ ticket.event }}</h3>
+                    <p>Date: {{ ticket.date }}</p>
+                    <p>Time: {{ ticket.time }}</p>
+                    <p>Price: £{{ ticket.price }}</p>
+                    <p class="user"><strong>Seller:</strong> {{ ticket.seller.username }}</p>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <p>You are not selling any tickets at the moment.</p>
+              {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('edit_profile').style.display = 'none';
+            document.getElementById('bought').style.display = 'none';
+            document.getElementById('sold').style.display = 'none';
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(tabName).style.display = 'block';
+            document.querySelector('.tab[onclick="showTab(\'' + tabName + '\')"]').classList.add('active');
+        }
+
+        // Show 'Tickets Bought' tab by default
+        showTab('profile');
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+{% include 'ticket_app/navbar.html' %}
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExEvents - All Tickets</title>
+    <style>
+        a {
+            text-decoration: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow-x: hidden; 
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Background image */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{% static "ticket_app/clubscene.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: blur(5px); /* Adjust blur for better visibility */
+            z-index: -1;
+        }
+
+        /* Adjust content margin for fixed navbar */
+        .content {
+            margin-top: 70px; /* Adjust this value based on the height of your fixed navbar */
+            padding: 20px;
+        }
+
+
+        /* Ticket Listings */
+        .tickets-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            margin-top: 70px; /* Adjust this if needed based on the navbar height */
+            max-width: 100%;
+        }
+
+        .ticket-card {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            color: #333;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .ticket-card h2 {
+            font-size: 20px;
+            color: #007bff; /* Blue color for ticket headers */
+        }
+
+        .ticket-card p {
+            margin: 10px 0;
+        }
+
+        .ticket-card .price {
+            font-size: 1.2em;
+            color: #007bff;
+        }
+
+        .ticket-card .user {
+            font-style: italic;
+            color: #777;
+        }
+
+        .ticket-card:hover {
+            background-color: #f9f9f9;
+        }
+        
+        h1 {
+            text-align: center;
+            
+        }
+        .ticket-link {
+            text-decoration: none; /* Remove underline */
+            color: inherit; /* Inherit the color of the content */
+            display: inline-block;
+            width: 100%;
+        }
+
+        /* Dropdown for sorting and club selection */
+        .sort-filter-dropdown {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sort-filter-dropdown select {
+            padding: 10px;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Background Image -->
+<div class="background"></div>
+
+<!-- Main Content -->
+<div class="content">
+    <h1><u>All Tickets</u></h1>
+
+    <!-- Sorting options  -->
+    
+    <div class="sort-filter-dropdown">
+        <form method="GET" action="">
+            <label for="sort">Sort by:</label>
+            <select name="sort" id="sort" onchange="this.form.submit()">
+                <option value="">-- Select Sort Option --</option>
+                <option value="price" {% if request.GET.sort == "price" %}selected{% endif %}>Price (Low to High)</option>
+                <option value="-price" {% if request.GET.sort == "-price" %}selected{% endif %}>Price (High to Low)</option>
+                <option value="time" {% if request.GET.sort == "time" %}selected{% endif %}>Time (Early to Late)</option>
+                <option value="-time" {% if request.GET.sort == "-time" %}selected{% endif %}>Time (Late to Early)</option>
+                <option value="date" {% if request.GET.sort == "date" %}selected{% endif %}>Date (Early to Late)</option>
+                <option value="-date" {% if request.GET.sort == "-date" %}selected{% endif %}>Date (Late to Early)</option>
+            </select>
+            
+            <label for="club">Filter by Club:</label>
+            <select name="club" id="club" onchange="this.form.submit()">
+                <option value="">-- Select Club --</option>
+                <option value="Fever" {% if request.GET.club == "Fever" %}selected{% endif %}>Fever</option>
+                <option value="Timepiece" {% if request.GET.club == "Timepiece" %}selected{% endif %}>Timepiece</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Tickets containers -->
+    <div class="tickets-container">
+        {% for ticket in tickets %}
+        <a href="{% url 'buy_ticket' ticket.id %} " class="ticketlink">
+            <div class="ticket-card">
+                <h2><u>{{ ticket.event }}</u></h2>
+                <p><strong>Date:</strong> {{ ticket.date }}</p>
+                <p><strong>Time:</strong> {{ ticket.time }}</p>
+                <p class="price"><strong>Price:</strong> £{{ ticket.price }}</p>
+                <p class="user"><strong>Seller:</strong> {{ ticket.seller.username }}</p>
+            </div>
+        </a>
+        {% empty %}
+        <p>No tickets available.</p>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>
+
